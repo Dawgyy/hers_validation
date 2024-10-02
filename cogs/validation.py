@@ -69,16 +69,20 @@ class ValidationCog(commands.Cog):
                 "message", check=check, timeout=120.0
             )
             roles = [role for role in role_message.role_mentions]
+
             if len(roles) < 2:
                 await interaction.followup.send(
-                    "Vous devez mentionner au moins deux rôles:"
-                    + " les rôles uniques et un rôle de validation.",
+                    "Vous devez mentionner au moins deux rôles: les rôles uniques et un rôle de validation.",
                     ephemeral=True,
                 )
                 return
 
             validation_role = roles[0]
+
             unique_roles = roles[1:]
+
+            print(f"Validation Role: {validation_role.name}, Unique Roles: {[role.name for role in unique_roles]}")
+
 
             options = [
                 discord.SelectOption(label=role.name, value=f"role_{role.id}")
