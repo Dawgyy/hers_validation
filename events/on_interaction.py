@@ -126,9 +126,7 @@ class OnInteraction(commands.Cog):
                             )
                             return
 
-                        await user.send(
-                            "Votre validation a été acceptée, bienvenue!"
-                        )
+                        await user.send("Votre validation a été acceptée, bienvenue!")
 
                         original_embed.description += (
                             f"\n\nDemande acceptée par {interaction.user.mention}"
