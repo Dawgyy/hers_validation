@@ -31,7 +31,7 @@ class ValidationCog(commands.Cog):
         """
         A command to initiate role selection and validation process.
 
-        This command asks the user to provide unique roles and a validation role.
+        This command asks the user to provide a validation role and unique roles.
         It then sends a message in a specified channel for role selection.
 
         Args:
@@ -45,8 +45,7 @@ class ValidationCog(commands.Cog):
         """
         try:
             await interaction.response.send_message(
-                "Veuillez mentionner les rôles uniques disponibles (par exemple: @role1 @role2 ...)"
-                + " puis mentionnez le rôle de validation.",
+                "Veuillez mentionner le rôle de validation (par exemple: @role).",
                 ephemeral=True,
             )
         except discord.Forbidden:
@@ -65,28 +64,44 @@ class ValidationCog(commands.Cog):
             return msg.author == interaction.user and msg.channel == interaction.channel
 
         try:
-            role_message = await self.bot.wait_for(
+            # Get validation role
+            validation_message = await self.bot.wait_for(
                 "message", check=check, timeout=120.0
             )
-            roles = [role for role in role_message.role_mentions]
+            validation_role_mentions = [
+                role for role in validation_message.role_mentions
+            ]
 
-            if len(roles) < 2:
+            if len(validation_role_mentions) != 1:
                 await interaction.followup.send(
-                    "Vous devez mentionner au moins deux rôles: les rôles uniques et un rôle de validation.",
+                    "Vous devez mentionner un seul rôle de validation.",
                     ephemeral=True,
                 )
                 return
 
-            validation_role = roles[0]
+            validation_role = validation_role_mentions[0]
 
-            unique_roles = roles[1:]
+            await interaction.followup.send(
+                "Veuillez mentionner les rôles uniques disponibles (par exemple: @role1 @role2 ...).",
+                ephemeral=True,
+            )
 
-            print(f"Validation Role: {validation_role.name}, Unique Roles: {[role.name for role in unique_roles]}")
+            # Get unique roles
+            role_message = await self.bot.wait_for(
+                "message", check=check, timeout=120.0
+            )
+            unique_role_mentions = [role for role in role_message.role_mentions]
 
+            if len(unique_role_mentions) < 1:
+                await interaction.followup.send(
+                    "Vous devez mentionner au moins un rôle unique.",
+                    ephemeral=True,
+                )
+                return
 
             options = [
                 discord.SelectOption(label=role.name, value=f"role_{role.id}")
-                for role in unique_roles
+                for role in unique_role_mentions
             ]
             select_menu = discord.ui.Select(
                 placeholder="Choisissez votre rôle",
@@ -98,24 +113,13 @@ class ValidationCog(commands.Cog):
             embed = discord.Embed(
                 title="Sélection de rôle",
                 description=(
-                    f"Rôles uniques: {', '.join([role.mention for role in unique_roles])}\n"
+                    f"Rôles uniques: {', '.join([role.mention for role in unique_role_mentions])}\n"
                     f"Rôle de validation: {validation_role.mention}\n"
                     f"Channel de validation: {channel_validation.id}"
                 ),
             )
 
-            try:
-                await channel_home.send(embed=embed, view=view)
-            except discord.Forbidden:
-                await interaction.followup.send(
-                    "Je n'ai pas la permission d'envoyer le message dans le channel demandé.",
-                    ephemeral=True,
-                )
-            except discord.HTTPException:
-                await interaction.followup.send(
-                    "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer.",
-                    ephemeral=True,
-                )
+            await channel_home.send(embed=embed, view=view)
 
         except asyncio.TimeoutError:
             await interaction.followup.send(
