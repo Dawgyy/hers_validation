@@ -77,8 +77,8 @@ class ValidationCog(commands.Cog):
                 )
                 return
 
-            unique_roles = roles[1:]
             validation_role = roles[0]
+            unique_roles = roles[1:]
 
             options = [
                 discord.SelectOption(label=role.name, value=f"role_{role.id}")
