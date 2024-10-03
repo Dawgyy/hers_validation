@@ -158,7 +158,7 @@ class OnInteraction(commands.Cog):
 
         elif interaction.type == discord.InteractionType.modal_submit:
             if interaction.data["custom_id"].startswith("verification_"):
-                validation_channel_id, selected_role_id = map(int, interaction.custom_id.split("_")[1:])
+                validation_channel_id, selected_role_id = map(int, interaction.data["custom_id"].split("_")[1:])
                 channel_validation = interaction.guild.get_channel(
                     validation_channel_id
                 )
