@@ -57,7 +57,7 @@ class OnInteraction(commands.Cog):
                     if custom_id.startswith("accept_"):
                         original_embed = interaction.message.embeds[0]
                         roles_text = original_embed.description.split(
-                            "Rôles unique: "
+                            "Rôle unique: "
                         )[1].split("\n")[0]
                         validation_role_text = original_embed.description.split(
                             "Rôle de validation: "
@@ -179,7 +179,7 @@ class OnInteraction(commands.Cog):
                         f"Nom: {first_name}\n"
                         f"Prénom: {last_name}\n"
                         f"Utilisateur: {interaction.user.mention}\n"
-                        f"Rôle uniques: {roles_text}\n"
+                        f"Rôle unique: {roles_text}\n"
                         f"Rôle de validation: {validation_role_text}"
                     ),
                     color=discord.Color.orange(),
