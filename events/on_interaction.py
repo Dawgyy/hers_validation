@@ -31,20 +31,25 @@ class OnInteraction(commands.Cog):
             if custom_id == "select_unique_role":
                 original_embed = interaction.message.embeds[0]
                 validation_channel_id = int(
-                    original_embed.description.split("Channel de validation: ")[1].split("\n")[0]
+                    original_embed.description.split("Channel de validation: ")[
+                        1
+                    ].split("\n")[0]
                 )
-                
+
                 selected_value = interaction.data.get("values", [None])[0]
                 if not selected_value:
-                    await interaction.response.send_message("Aucun rôle n'a été sélectionné.", ephemeral=True)
+                    await interaction.response.send_message(
+                        "Aucun rôle n'a été sélectionné.", ephemeral=True
+                    )
                     return
-                
-                selected_role_id = int(selected_value.split("_")[1])
-                
-                modal = VerificationModal()
-                modal.custom_id = f"verification_{validation_channel_id}_{selected_role_id}"
-                await interaction.response.send_modal(modal)
 
+                selected_role_id = int(selected_value.split("_")[1])
+
+                modal = VerificationModal()
+                modal.custom_id = (
+                    f"verification_{validation_channel_id}_{selected_role_id}"
+                )
+                await interaction.response.send_modal(modal)
 
             elif custom_id and (
                 custom_id.startswith("accept_") or custom_id.startswith("deny_")
@@ -56,9 +61,9 @@ class OnInteraction(commands.Cog):
                     await interaction.response.defer()
                     if custom_id.startswith("accept_"):
                         original_embed = interaction.message.embeds[0]
-                        roles_text = original_embed.description.split(
-                            "Rôle unique: "
-                        )[1].split("\n")[0]
+                        roles_text = original_embed.description.split("Rôle unique: ")[
+                            1
+                        ].split("\n")[0]
                         validation_role_text = original_embed.description.split(
                             "Rôle de validation: "
                         )[1].split("\n")[0]
@@ -158,7 +163,9 @@ class OnInteraction(commands.Cog):
 
         elif interaction.type == discord.InteractionType.modal_submit:
             if interaction.data["custom_id"].startswith("verification_"):
-                validation_channel_id, selected_role_id = map(int, interaction.data["custom_id"].split("_")[1:])
+                validation_channel_id, selected_role_id = map(
+                    int, interaction.data["custom_id"].split("_")[1:]
+                )
                 channel_validation = interaction.guild.get_channel(
                     validation_channel_id
                 )
