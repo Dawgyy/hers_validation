@@ -116,8 +116,8 @@ class OnInteraction(commands.Cog):
 
                         if bot_top_role <= user_top_role:
                             await interaction.followup.send(
-                                f"""Je ne peut pas modifier le nom de {user.mention}
-                                parce que le rôle du bot est inférieur ou égal u v^tre.""",
+                                f"Je ne peut pas modifier le nom de {user.mention}"
+                                + " parce que le rôle du bot est inférieur ou égal au vôtre.",
                                 ephemeral=True,
                             )
                             return
