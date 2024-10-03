@@ -64,7 +64,6 @@ class ValidationCog(commands.Cog):
             return msg.author == interaction.user and msg.channel == interaction.channel
 
         try:
-            # Get validation role
             validation_message = await self.bot.wait_for(
                 "message", check=check, timeout=120.0
             )
@@ -86,7 +85,6 @@ class ValidationCog(commands.Cog):
                 ephemeral=True,
             )
 
-            # Get unique roles
             role_message = await self.bot.wait_for(
                 "message", check=check, timeout=120.0
             )
