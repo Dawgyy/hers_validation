@@ -28,19 +28,24 @@ class OnInteraction(commands.Cog):
         custom_id = interaction.data.get("custom_id")
 
         if interaction.type == discord.InteractionType.component:
-            # Handle role selection interaction
             if custom_id == "select_unique_role":
                 original_embed = interaction.message.embeds[0]
                 validation_channel_id = int(
-                    original_embed.description.split("Channel de validation: ")[
-                        1
-                    ].split("\n")[0]
+                    original_embed.description.split("Channel de validation: ")[1].split("\n")[0]
                 )
+                
+                selected_value = interaction.data.get("values", [None])[0]
+                if not selected_value:
+                    await interaction.response.send_message("Aucun rôle n'a été sélectionné.", ephemeral=True)
+                    return
+                
+                selected_role_id = int(selected_value.split("_")[1])
+                
                 modal = VerificationModal()
-                modal.custom_id = f"verification_{validation_channel_id}"
+                modal.custom_id = f"verification_{validation_channel_id}_{selected_role_id}"
                 await interaction.response.send_modal(modal)
 
-            # Handle accept or deny button interaction
+
             elif custom_id and (
                 custom_id.startswith("accept_") or custom_id.startswith("deny_")
             ):
@@ -52,7 +57,7 @@ class OnInteraction(commands.Cog):
                     if custom_id.startswith("accept_"):
                         original_embed = interaction.message.embeds[0]
                         roles_text = original_embed.description.split(
-                            "Rôles uniques: "
+                            "Rôles unique: "
                         )[1].split("\n")[0]
                         validation_role_text = original_embed.description.split(
                             "Rôle de validation: "
@@ -140,6 +145,7 @@ class OnInteraction(commands.Cog):
 
                     elif custom_id.startswith("deny_"):
                         await user.send("Votre demande a été refusée.")
+                        original_embed = interaction.message.embeds[0]
                         original_embed.description += (
                             f"\n\nDemande refusée par {interaction.user.mention}"
                         )
@@ -152,18 +158,15 @@ class OnInteraction(commands.Cog):
 
         elif interaction.type == discord.InteractionType.modal_submit:
             if interaction.data["custom_id"].startswith("verification_"):
-                validation_channel_id = int(interaction.data["custom_id"].split("_")[1])
+                validation_channel_id, selected_role_id = map(int, interaction.custom_id.split("_")[1:])
                 channel_validation = interaction.guild.get_channel(
                     validation_channel_id
                 )
                 first_name = interaction.data["components"][0]["components"][0]["value"]
                 last_name = interaction.data["components"][1]["components"][0]["value"]
 
-                roles_text = (
-                    interaction.message.embeds[0]
-                    .description.split("Rôles uniques: ")[1]
-                    .split("\n")[0]
-                )
+                roles_text = selected_role_id
+
                 validation_role_text = (
                     interaction.message.embeds[0]
                     .description.split("Rôle de validation: ")[1]
@@ -176,7 +179,7 @@ class OnInteraction(commands.Cog):
                         f"Nom: {first_name}\n"
                         f"Prénom: {last_name}\n"
                         f"Utilisateur: {interaction.user.mention}\n"
-                        f"Rôles uniques: {roles_text}\n"
+                        f"Rôle uniques: {roles_text}\n"
                         f"Rôle de validation: {validation_role_text}"
                     ),
                     color=discord.Color.orange(),
