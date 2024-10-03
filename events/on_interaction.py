@@ -165,7 +165,7 @@ class OnInteraction(commands.Cog):
                 first_name = interaction.data["components"][0]["components"][0]["value"]
                 last_name = interaction.data["components"][1]["components"][0]["value"]
 
-                roles_text = selected_role_id
+                roles_text = "<@"+{selected_role_id}+">"
 
                 validation_role_text = (
                     interaction.message.embeds[0]
