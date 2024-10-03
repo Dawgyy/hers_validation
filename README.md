@@ -67,7 +67,10 @@ Ensure that your `.env` file contains a valid bot token.
 ## Usage
 
 Use the `/role` command to set up the role selection in your Discord server.
+Place the bot at the very top in the role hierarchy.
 
+- `channel_home`: channel where the main embed with selection for student will be send.
+- `channel_validation`: channel where admins will validate students.
 ## File Structure
 
 ```sh
